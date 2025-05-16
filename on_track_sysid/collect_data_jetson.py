@@ -38,33 +38,19 @@ class JetsonDataLogger(Node):
         self.collect_data()
 
     def steering_callback(self, msg):
-        self.steering = abs(msg.drive.steering_angle)
+        self.current_state[3] = abs(msg.drive.steering_angle)
         self.collect_data()
 
     def collect_data(self):
-            """
-            Collects data during simulation.
-
-            Adds the current state to the data array and updates the counter.
-            Closes the progress bar and logs a message if data collection is complete.
-            """
-            self.get_logger().info("Data Collection Started")
-            
-            '''if self.current_state[0] > 0.0: # Only collect data when the car is moving
-                self.data = np.roll(self.data, -1, axis=0)
-                self.data[-1] = self.current_state
+        if self.counter <= self.timesteps:
+            if self.current_state[0] > 0.0:  # collect only if moving
+                self.dataset[self.counter] = self.current_state
                 self.counter += 1
-            if self.counter == self.timesteps + 1:
-                self.get_logger().info("Data collection completed.")'''
-            
-            while self.counter <= self.timesteps:
-                if self.current_state[0] > 0.0: # Only collect data when the car is moving
-                    self.data = np.roll(self.data, -1, axis=0)
-                    self.data[-1] = self.current_state
-                    self.counter += 1
-                    self.get_logger().info(f"No. of rows recorded: {self.counter}")
-            self.get_logger().info("Data collection completed.")
-                
+                self.get_logger().info(f"No. of rows recorded: {self.counter}")
+            if self.counter == self.timesteps:
+                self.get_logger().info("Data collection completed.")
+                rclpy.shutdown()
+
 
     def export_data_as_csv(self):
         ch = input("Save data to csv? (y/n): ")
@@ -81,19 +67,22 @@ class JetsonDataLogger(Node):
             self.get_logger().info("Exported to CSV successfully")
             file.close()
     
-    def loop(self):
+    '''def loop(self):
         while rclpy.ok():
             self.collect_data()
             print(self.counter)
             if self.counter == self.timesteps + 1:
                 self.export_data_as_csv()
                 self.destroy_node()
-                rclpy.shutdown()
+                rclpy.shutdown()'''
 
 def main(args=None):
     rclpy.init(args=args)
     node = JetsonDataLogger()
-    node.loop()
+    rclpy.spin(node)
+    node.export_data_as_csv()
+    node.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
