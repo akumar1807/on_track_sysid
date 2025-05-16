@@ -13,7 +13,7 @@ import os
 def get_model_param(racecar_version):
     #rospack = rospkg.RosPack()
     ros2pack = ament_index_python.packages
-    package_path = 'src/sys_id_py' # Replace with your package name
+    package_path = 'src/on_track_sysid' # Replace with your package name
     yaml_file = os.path.join(package_path, 'params/pacejka_params.yaml')
     with open(yaml_file, 'r') as file:
         pacejka_params = yaml.safe_load(file)

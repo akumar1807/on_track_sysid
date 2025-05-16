@@ -7,13 +7,13 @@ from sys_id_py.train_model import nn_train
 
 class JetsonSysID():
     def __init__(self):
-        try:
+        '''try:
             self.package_path = get_package_share_directory('sys_id_py')
         except Exception as e:
             print(f"Error: Could not find package 'sys_id_py'")
-            return
+            return'''
         self.rate = 50
-        self.model_version = 'JETSON'
+        self.racecar_version = 'JETSON'
         self.plot_model = True
         self.load_parameters()
         self.setup_data_storage()
@@ -22,7 +22,7 @@ class JetsonSysID():
     def setup_data_storage(self):
         '''self.data_duration = self.nn_params['data_collection_duration']
         self.timesteps = self.data_duration * self.rate'''
-        self.file = open("src/sys_id_py/jetson_training_data.csv", 'r')
+        self.file = open(f"src/on_track_sysid/{self.racecar_version}_training_data.csv", 'r')
         self.v_x = np.array([])
         self.v_y = np.array([])
         self.steering = np.array([])
@@ -46,7 +46,7 @@ class JetsonSysID():
         
     def run_nn_train(self):
         print("Begin Training")
-        nn_train(self.dataset, self.model_version, self.plot_model)
+        nn_train(self.dataset, self.racecar_version, self.plot_model)
         
 def main():
     sysid = JetsonSysID()

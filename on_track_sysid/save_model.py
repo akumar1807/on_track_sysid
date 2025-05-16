@@ -11,7 +11,7 @@ def save(model, overwrite_existing=True, verbose=False):
         print(f"Error: Could not find package 'sys_id_py'. {e}")
         return'''
     
-    package_path = 'src/sys_id_py'
+    package_path = 'src/on_track_sysid'
     
     file_path = os.path.join(package_path, "models", model['model_name'], f"{model['model_name']}_{model['tire_model']}.txt")
     

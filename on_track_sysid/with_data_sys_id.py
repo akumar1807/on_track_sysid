@@ -4,15 +4,15 @@ import yaml
 import csv
 from ament_index_python.packages import get_package_share_directory
 #from collect_data_for_sys_id import DataLogger
-from sys_id_py.train_model import nn_train
+from on_track_sysid.train_model import nn_train
 
 class RegularSysID():
     def __init__(self):
-        try:
+        '''try:
             self.package_path = get_package_share_directory('sys_id_py')
         except Exception as e:
             print(f"Error: Could not find package 'sys_id_py'")
-            return
+            return'''
         self.rate = 50
         self.model_version = 'SIM'
         self.plot_model = True
@@ -23,7 +23,7 @@ class RegularSysID():
     def setup_data_storage(self):
         '''self.data_duration = self.nn_params['data_collection_duration']
         self.timesteps = self.data_duration * self.rate'''
-        self.file = open("src/sys_id_py/f1_training_data.csv", 'r')
+        self.file = open("src/on_track_sysid/f1_training_data.csv", 'r')
         speed_x = np.array([])
         speed_y = np.array([])
         steering_angle = np.array([])
@@ -40,7 +40,7 @@ class RegularSysID():
         print(self.dataset.shape)
 
     def load_parameters(self):
-        yaml_file = os.path.join('src/sys_id_py/params/nn_params.yaml')
+        yaml_file = os.path.join('src/on_track_sysid/params/nn_params.yaml')
         with open(yaml_file, 'r') as file:
             self.nn_params = yaml.safe_load(file)
         

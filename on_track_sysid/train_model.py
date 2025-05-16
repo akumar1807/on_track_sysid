@@ -3,20 +3,19 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.optim import Adam
-from sys_id_py.filter_data import process_data
-from sys_id_py.generate_predictions import generate_predictions
-from sys_id_py.generate_inputs_errors import generate_inputs_errors
-from sys_id_py.model_params import get_model_param
-from sys_id_py.nn_params import get_nn_params
-from sys_id_py.NN import NeuralNetwork
-from sys_id_py.pacejka_formula import pacejka_formula
-from sys_id_py.solve_pacejka import solve_pacejka
-from sys_id_py.save_model import save
-from sys_id_py.load_model import get_dotdict
-from sys_id_py.plot_results import plot_results
-from sys_id_py.gen_LUT import LookupGenerator
+from on_track_sysid.filter_data import process_data
+from on_track_sysid.generate_predictions import generate_predictions
+from on_track_sysid.generate_inputs_errors import generate_inputs_errors
+from on_track_sysid.model_params import get_model_param
+from on_track_sysid.nn_params import get_nn_params
+from on_track_sysid.NN import NeuralNetwork
+from on_track_sysid.pacejka_formula import pacejka_formula
+from on_track_sysid.solve_pacejka import solve_pacejka
+from on_track_sysid.save_model import save
+from on_track_sysid.load_model import get_dotdict
+from on_track_sysid.plot_results import plot_results
+from on_track_sysid.gen_LUT import LookupGenerator
 import rclpy
-#import rospkg
 from tqdm import tqdm
 
 def simulated_data_gen(nn_model, model, avg_vel):

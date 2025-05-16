@@ -1,6 +1,6 @@
 #Taken from ETH repo and modified
 from scipy.optimize import least_squares
-from sys_id_py.pacejka_formula import pacejka_formula
+from on_track_sysid.pacejka_formula import pacejka_formula
 import numpy as np
 
 def analyse_tires(model, v_x, v_y, omega, delta):

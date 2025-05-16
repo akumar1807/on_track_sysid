@@ -5,7 +5,6 @@ import numpy as np
 from mpl_toolkits.mplot3d import Axes3D  # Required for 3D plotting
 import matplotlib.pyplot as plt
 import os
-import rospkg
 
 SIMULATION_DURATION = 2.0 # seconds
 SIMULATION_DT = 0.01 # seconds
@@ -54,8 +53,7 @@ class LookupGenerator:
     self.save_lookup()
 
   def load_lookup(self, model, name):
-    rospack = rospkg.RosPack()
-    package_path = rospack.get_path('sys_id_py')
+    package_path = "src/on_track_sysid"
     file_path = os.path.join(package_path, "models", model, name + "_lookup_table.csv")
     self.lookup_table = np.loadtxt(file_path, delimiter=",")
     self.find_upper_limits()
@@ -156,8 +154,7 @@ class LookupGenerator:
     plt.show()
 
   def save_lookup(self):
-    rospack = rospkg.RosPack()
-    path = "src/sys_id_py"
+    path = "src/on_track_sysid"
     file_path = os.path.join(path, "models", self.racecar_version, self.save_LUT_name + "_lookup_table.csv")
     np.savetxt(file_path, self.lookup_table, delimiter=",")
     print(f"SAVED LOOKUP TABLE TO: {file_path}")
