@@ -20,7 +20,7 @@ def get_model_param(racecar_version):
         
     # Load vehicle parameters
     #yaml_file = os.path.join(package_path, 'models', racecar_version, racecar_version + '_pacejka.txt')
-    yaml_file = os.path.join(package_path, f'models/{racecar_version}.txt')
+    yaml_file = os.path.join(package_path, f'models/{racecar_version}/{racecar_version}_pacejka.txt')
     with open(yaml_file, 'r') as file:
         vehicle_params = yaml.safe_load(file)
 

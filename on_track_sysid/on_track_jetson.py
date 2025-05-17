@@ -6,7 +6,7 @@ import os
 import numpy as np
 from nav_msgs.msg import Odometry
 from ackermann_msgs.msg import AckermannDriveStamped
-from sys_id_py.train_model import nn_train
+from on_track_sysid.train_model import nn_train
 
 class sys_id_for_jetson(Node):
     def __init__(self):

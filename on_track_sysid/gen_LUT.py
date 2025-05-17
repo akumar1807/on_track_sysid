@@ -1,5 +1,5 @@
-from sys_id_py.vehicle_dynamics import vehicle_dynamics_st
-from sys_id_py.load_model import get_dotdict
+from on_track_sysid.vehicle_dynamics import vehicle_dynamics_st
+from on_track_sysid.load_model import get_dotdict
 from scipy.integrate import odeint
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D  # Required for 3D plotting
@@ -106,7 +106,7 @@ class LookupGenerator:
         local_max_idx = np.argwhere(d_a_lats < 0)
         if local_max_idx.size != 0:
           max_idx = local_max_idx[0]
-      print(type(max_idx))
+      #print(type(max_idx))
       # set everything above max_idx to nan
       self.lookup_table[max_idx+1:, vel_idx] = None
 

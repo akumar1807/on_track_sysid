@@ -1,7 +1,7 @@
 #Taken from ETH Repo and modified
 import yaml
 import os
-from sys_id_py.dotdict import DotDict
+from on_track_sysid.dotdict import DotDict
 import rospkg
 
 def get_dict(model_name):

@@ -49,6 +49,8 @@ class JetsonDataLogger(Node):
                 self.get_logger().info(f"No. of rows recorded: {self.counter}")
             if self.counter == self.timesteps:
                 self.get_logger().info("Data collection completed.")
+                self.export_data_as_csv()
+                self.destroy_node()
                 rclpy.shutdown()
 
 
@@ -80,9 +82,6 @@ def main(args=None):
     rclpy.init(args=args)
     node = JetsonDataLogger()
     rclpy.spin(node)
-    node.export_data_as_csv()
-    node.destroy_node()
-    rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
