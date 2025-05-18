@@ -4,6 +4,7 @@ import csv
 import yaml
 import os
 import numpy as np
+from std_msgs.msg import Float64
 from nav_msgs.msg import Odometry
 from ackermann_msgs.msg import AckermannDriveStamped
 
@@ -14,12 +15,16 @@ class JetsonDataLogger(Node):
         
         self.load_parameters()
         self.data_collection_duration = self.nn_params['data_collection_duration']
-        self.rate = 40
+        self.rate = 50
         self.storage_setup()
 
         self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
-        self.create_subscription(AckermannDriveStamped, '/drive', self.steering_callback, 10)
+        self.create_subscription(Float64, '/commands/servo/position', self.steering_callback, 10)
         
+        # Shutdown logic
+        self.shutdown_triggered = False
+        self.shutdown_timer = self.create_timer(0.1, self.check_shutdown)
+
     def load_parameters(self):
         yaml_file = os.path.join('src/on_track_sysid/params/nn_params.yaml')
         with open(yaml_file, 'r') as file:
@@ -38,7 +43,10 @@ class JetsonDataLogger(Node):
         self.collect_data()
 
     def steering_callback(self, msg):
-        self.current_state[3] = abs(msg.drive.steering_angle)
+        servo_val = msg.data
+        offset = 0.5304
+        gain = -1.2135
+        self.current_state[3] = (servo_val-offset)/gain
         self.collect_data()
 
     def collect_data(self):
@@ -50,9 +58,13 @@ class JetsonDataLogger(Node):
             if self.counter == self.timesteps:
                 self.get_logger().info("Data collection completed.")
                 self.export_data_as_csv()
-                self.destroy_node()
-                rclpy.shutdown()
+                self.shutdown_triggered = True
 
+    def check_shutdown(self):
+        if self.shutdown_triggered:
+            self.get_logger().info("Shutting down node...")
+            self.destroy_node()
+            rclpy.shutdown()
 
     def export_data_as_csv(self):
         ch = input("Save data to csv? (y/n): ")
