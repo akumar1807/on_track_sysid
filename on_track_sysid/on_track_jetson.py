@@ -4,24 +4,32 @@ import csv
 import yaml
 import os
 import numpy as np
+from std_msgs.msg import Float64
 from nav_msgs.msg import Odometry
 from ackermann_msgs.msg import AckermannDriveStamped
 from on_track_sysid.train_model import nn_train
 
-class sys_id_for_jetson(Node):
+class SysIDForJetson(Node):
     def __init__(self):
-        super().__init__('ontrack') 
+        super().__init__('ontrack')
         self.racecar_version = 'JETSON'
         self.plot_model = True
 
         self.load_parameters()
         self.data_collection_duration = self.nn_params['data_collection_duration']
-        self.rate = 40
+        self.rate = 50  # Hz
         self.storage_setup()
-        
-        #Subscriptions
+
         self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
-        self.create_subscription(AckermannDriveStamped, '/drive', self.steering_callback, 10)
+        self.create_subscription(Float64, '/commands/servo/position', self.steering_callback, 10)
+
+        # Shutdown flag
+        self.shutdown_triggered = False
+
+        # Main data collection timer
+        self.create_timer(1.0 / self.rate, self.collect_data)
+        # Shutdown check
+        self.create_timer(0.1, self.check_shutdown)
 
     def load_parameters(self):
         yaml_file = os.path.join('src/on_track_sysid/params/nn_params.yaml')
@@ -29,66 +37,55 @@ class sys_id_for_jetson(Node):
             self.nn_params = yaml.safe_load(file)
 
     def storage_setup(self):
-        self.timesteps = self.data_collection_duration*self.rate
-        self.dataset = np.zeros((self.timesteps,4))
+        self.timesteps = self.data_collection_duration * self.rate
+        self.dataset = np.zeros((self.timesteps, 4))  # [vx, vy, yaw_rate, steering]
         self.current_state = np.zeros(4)
         self.counter = 0
 
     def odom_callback(self, msg):
-        self.current_state[0] = msg.twist.twist.linear.x
-        self.current_state[1] = msg.twist.twist.linear.y
-        self.current_state[2] = msg.twist.twist.angular.z
-        self.export_data_as_csv()
+        self.current_state[0] = abs(msg.twist.twist.linear.x)
+        self.current_state[1] = abs(msg.twist.twist.linear.y)
+        self.current_state[2] = abs(msg.twist.twist.angular.z)
 
     def steering_callback(self, msg):
-        self.current_state[3] = msg.drive.steering_angle
-        self.export_data_as_csv()
+        servo_val = msg.data
+        offset = 0.5304
+        gain = -1.2135
+        self.current_state[3] = (servo_val-offset)/gain
+
+    def collect_data(self):
+        if self.counter < self.timesteps:
+            if self.current_state[0] > 0.0:  # Only collect data when car is moving
+                self.dataset[self.counter] = self.current_state
+                self.counter += 1
+                self.get_logger().info(f"No. of rows recorded: {self.counter}")
+        elif not self.shutdown_triggered:
+            self.get_logger().info("Data collection completed.")
+            self.get_logger().info("Starting training...")
+            nn_train(self.dataset, self.racecar_version, self.plot_model)
+            self.export_data_as_csv()
+            self.shutdown_triggered = True
+
+    def check_shutdown(self):
+        if self.shutdown_triggered:
+            self.get_logger().info("Shutting down node...")
+            self.destroy_node()
+            rclpy.shutdown()
 
     def export_data_as_csv(self):
-        ch = input("Save data to csv? (y/n): ")
-        if ch == "y":
+        ch = input("Save data to CSV? (y/n): ")
+        if ch.strip().lower() == 'y':
             data_dir = os.path.join('src/on_track_sysid', 'data')
-            if not os.path.exists(data_dir):
-                os.makedirs(data_dir)
+            os.makedirs(data_dir, exist_ok=True)
             csv_file = os.path.join(data_dir, f'{self.racecar_version}_sys_id_data.csv')
             with open(csv_file, 'w') as file:
                 writer = csv.writer(file)
                 writer.writerow(['speed_x', 'speed_y', 'omega', 'steering_angle'])
                 for row in self.dataset:
                     writer.writerow(row)
-            self.get_logger().info("Exported to CSV successfully")
-            
-    def collect_data(self):
-        """
-        Collects data during simulation.
+            self.get_logger().info("Exported to CSV successfully.")
 
-        Adds the current state to the data array and updates the counter.
-        Closes the progress bar and logs a message if data collection is complete.
-        """
-        if self.current_state[0] > 0.0: # Only collect data when the car is moving
-            self.data = np.roll(self.data, -1, axis=0)
-            self.data[-1] = self.current_state
-            self.counter += 1
-        if self.counter == self.timesteps + 1:
-            self.get_logger().info("Data collection completed.")
-
-    def loop(self):
-        """
-        Main loop for data collection, training, and exporting.
-
-        This loop continuously collects data until completion, then runs neural network training
-        and exports the collected data as CSV before shutting down the node.
-        """
-        #self.pbar = tqdm(total=self.timesteps, desc='Collecting data', ascii=True)
-        while rclpy.ok():
-            self.collect_data()
-            if self.counter == self.timesteps + 1:
-                self.get_logger().info("Begin Training")
-                nn_train(self.data, self.racecar_version, self.plot_model)
-                self.export_data_as_csv()
-                self.get_logger().info("Training completed. Shutting down...")
-                rclpy.shutdown()
-
-#_main_
-sys_id = sys_id_for_jetson()
-sys_id.loop()
+def main(args=None):
+    rclpy.init(args=args)
+    node = SysIDForJetson()
+    rclpy.spin(node)

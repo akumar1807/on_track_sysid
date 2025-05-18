@@ -29,9 +29,9 @@ def simulated_data_gen(nn_model, model, avg_vel):
     I_z = model['I_z']
     F_zf = m * g * l_r / l_wb
     F_zr = m * g * l_f / l_wb
-    dt = 0.025 # 0.02 for 50 Hz
+    dt = 0.02 # 0.02 for 50 Hz
 
-    timesteps = 1200 # Number of timesteps to simulate
+    timesteps = 1500 # Number of timesteps to simulate
     
     v_y = np.zeros(timesteps)  # Initial lateral velocity
     omega = np.zeros(timesteps)  # Initial yaw rate
