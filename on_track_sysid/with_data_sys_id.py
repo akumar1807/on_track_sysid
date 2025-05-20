@@ -1,18 +1,10 @@
 import numpy as np
 import os
 import yaml
-import csv
-from ament_index_python.packages import get_package_share_directory
-#from collect_data_for_sys_id import DataLogger
 from on_track_sysid.train_model import nn_train
 
 class RegularSysID():
     def __init__(self):
-        '''try:
-            self.package_path = get_package_share_directory('sys_id_py')
-        except Exception as e:
-            print(f"Error: Could not find package 'sys_id_py'")
-            return'''
         self.rate = 50
         self.model_version = 'SIM'
         self.plot_model = True

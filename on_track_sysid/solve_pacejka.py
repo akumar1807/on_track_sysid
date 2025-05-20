@@ -55,19 +55,12 @@ def analyse_tires(model, v_x, v_y, omega, delta):
 
     return alpha_f, alpha_r, F_zf, F_zr, F_yf, F_yr
 
-
-'''def pacejka_formula(params, alpha, F_z):
-    B, C, D, E = params
-    y =  F_z * D * np.sin(C*np.arctan(B*alpha - E * (B*alpha -np.arctan(B * alpha))))
-    return y'''
-
 def pacejka_error(params, *args):
     alpha, F_z, F_y = args
     y = pacejka_formula(params, alpha, F_z)
     error = np.sum((y - F_y)**2)
     # square error
     return error
-
 
 def solve_pacejka(model, v_x, v_y, omega, delta):
     alpha_f, alpha_r, F_zf, F_zr, F_yf, F_yr = analyse_tires(model, v_x, v_y, omega, delta)

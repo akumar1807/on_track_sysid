@@ -1,5 +1,4 @@
 #Taken from ETH repo and modified
-import ament_index_python
 import yaml
 import os
 
@@ -11,15 +10,12 @@ import os
         dict: Model parameters including tire and vehicle properties.
     """
 def get_model_param(racecar_version):
-    #rospack = rospkg.RosPack()
-    ros2pack = ament_index_python.packages
     package_path = 'src/on_track_sysid' # Replace with your package name
     yaml_file = os.path.join(package_path, 'params/pacejka_params.yaml')
     with open(yaml_file, 'r') as file:
         pacejka_params = yaml.safe_load(file)
         
     # Load vehicle parameters
-    #yaml_file = os.path.join(package_path, 'models', racecar_version, racecar_version + '_pacejka.txt')
     yaml_file = os.path.join(package_path, f'models/{racecar_version}/{racecar_version}_pacejka.txt')
     with open(yaml_file, 'r') as file:
         vehicle_params = yaml.safe_load(file)

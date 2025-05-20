@@ -15,7 +15,6 @@ from on_track_sysid.save_model import save
 from on_track_sysid.load_model import get_dotdict
 from on_track_sysid.plot_results import plot_results
 from on_track_sysid.gen_LUT import LookupGenerator
-import rclpy
 from tqdm import tqdm
 
 def simulated_data_gen(nn_model, model, avg_vel):
@@ -31,7 +30,7 @@ def simulated_data_gen(nn_model, model, avg_vel):
     F_zr = m * g * l_f / l_wb
     dt = 0.02 # 0.02 for 50 Hz
 
-    timesteps = 1500 # Number of timesteps to simulate
+    timesteps = 1501 # Number of timesteps to simulate
     
     v_y = np.zeros(timesteps)  # Initial lateral velocity
     omega = np.zeros(timesteps)  # Initial yaw rate
@@ -87,6 +86,14 @@ def generate_training_set(training_data, model):
     
     return X_train, y_train
 
+def assert_finite(t, name):
+    if not torch.isfinite(t).all():
+        bad = t[~torch.isfinite(t)]
+        print(f"DEBUG: {name} shape = {t.shape}")
+        print(f"DEBUG: First bad values: {bad[:5]}")
+        print(f"DEBUG: First row with NaNs: {t[torch.isnan(t).any(dim=1)][0]}")
+        raise ValueError(f"{name} contains non-finite values")
+
 def nn_train(training_data, racecar_version, plot_model):
     """    
     Trains the neural network using the provided training data and model parameters.
@@ -114,6 +121,13 @@ def nn_train(training_data, racecar_version, plot_model):
     avg_vel = np.mean(training_data[:,0]) # Defining average velocity for the simulation, NN will have more accurate predictions
     avg_vel = np.clip(avg_vel, 2.75, 4)
     
+    # Initialize the network
+    nn_model = NeuralNetwork()
+
+    # Loss and optimizer
+    criterion = nn.MSELoss()
+    optimizer = Adam(nn_model.parameters(), lr=lr, weight_decay=weight_decay)
+
     # Iterative training loop
     for i in range(1, num_of_iterations+1):
         if i == num_of_iterations: # Determine if it's the last iteration to enable plotting (if plot_model is False)
@@ -121,13 +135,11 @@ def nn_train(training_data, racecar_version, plot_model):
             
         # Process training data and generate inputs and targets
         X_train, y_train = generate_training_set(training_data, model)
-        
-        # Initialize the network
-        nn_model = NeuralNetwork()
+        '''X_train = torch.as_tensor(X_train, dtype=torch.float32)
+        y_train = torch.as_tensor(y_train, dtype=torch.float32)'''
 
-        # Loss and optimizer
-        criterion = nn.MSELoss()
-        optimizer = Adam(nn_model.parameters(), lr=lr)
+        assert_finite(X_train, "X_train")
+        assert_finite(y_train, "y_train")
 
         nn_model.train()
         pbar = tqdm(total=num_of_epochs, desc=f"Iteration: {i}/{num_of_iterations}, Epoch:", ascii=True)
@@ -138,6 +150,8 @@ def nn_train(training_data, racecar_version, plot_model):
             # Forward pass on training data
             outputs = nn_model(X_train)
             train_loss = criterion(outputs, y_train) # + nn_model.l2_regularization_loss() # TODO add regularization if needed
+            '''if epoch % 250 == 0:
+                print(train_loss)'''
             optimizer.zero_grad()
             train_loss.backward()
             optimizer.step()
@@ -148,7 +162,7 @@ def nn_train(training_data, racecar_version, plot_model):
                 nn_model.eval()
                 v_x, v_y, omega, delta = simulated_data_gen(nn_model, model, avg_vel)   
                 C_Pf_identified, C_Pr_identified = solve_pacejka(model, v_x, v_y, omega, delta)
-
+                print("Training loss: ", train_loss)
                 print(f"C_Pf_identified at Iteration {i}:", C_Pf_identified)
                 print(f"C_Pr_identified at Iteration {i}:", C_Pr_identified)
                 

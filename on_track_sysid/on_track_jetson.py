@@ -6,7 +6,6 @@ import os
 import numpy as np
 from std_msgs.msg import Float64
 from nav_msgs.msg import Odometry
-from ackermann_msgs.msg import AckermannDriveStamped
 from on_track_sysid.train_model import nn_train
 
 class SysIDForJetson(Node):

@@ -36,6 +36,8 @@ def generate_predictions(data, model):
     delta = data[:, 3]
     timesteps = np.size(v_x)
     
+    print(v_x)
+
     # Extract Pacejka tire model parameters
     B_f, C_f, D_f, E_f = C_Pf_model
     B_r, C_r, D_r, E_r = C_Pr_model
@@ -60,5 +62,4 @@ def generate_predictions(data, model):
         # Integrate to get the next predicted v_y and omega
         v_y_next_pred[t] = v_y[t] + v_y_dot * dt
         omega_next_pred[t] = omega[t] + omega_dot * dt
-
     return v_y_next_pred, omega_next_pred

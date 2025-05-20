@@ -6,7 +6,6 @@ import os
 import numpy as np
 from std_msgs.msg import Float64
 from nav_msgs.msg import Odometry
-from ackermann_msgs.msg import AckermannDriveStamped
 
 class JetsonDataLogger(Node):
     def __init__(self):
@@ -75,21 +74,13 @@ class JetsonDataLogger(Node):
             csv_file = os.path.join(data_dir, f'{self.racecar_version}_sys_id_data.csv')
             with open(csv_file, 'w') as file:
                 writer = csv.writer(file)
-                writer.writerow(['speed_x', 'speed_y', 'omega', 'steering_angle'])
+                print("Data Format: [speed_x, speed_y, omega, steering_angle] ")
+                #writer.writerow(['speed_x', 'speed_y', 'omega', 'steering_angle'])
                 for row in self.dataset:
                     writer.writerow(row)
             self.get_logger().info("Exported to CSV successfully")
             file.close()
     
-    '''def loop(self):
-        while rclpy.ok():
-            self.collect_data()
-            print(self.counter)
-            if self.counter == self.timesteps + 1:
-                self.export_data_as_csv()
-                self.destroy_node()
-                rclpy.shutdown()'''
-
 def main(args=None):
     rclpy.init(args=args)
     node = JetsonDataLogger()

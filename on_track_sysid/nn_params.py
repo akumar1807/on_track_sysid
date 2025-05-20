@@ -1,5 +1,4 @@
 import os
-import ament_index_python
 import yaml
 
 def get_nn_params():
@@ -11,7 +10,6 @@ def get_nn_params():
     Returns:
         dict: Neural network parameters.
     """
-    ros2pack = ament_index_python.packages
     package_path = 'src/on_track_sysid'  # Replace with your package name
     yaml_file = os.path.join(package_path, 'params/nn_params.yaml')
     with open(yaml_file, 'r') as file:
