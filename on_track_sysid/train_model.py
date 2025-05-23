@@ -7,7 +7,6 @@ from on_track_sysid.filter_data import process_data
 from on_track_sysid.generate_predictions import generate_predictions
 from on_track_sysid.generate_inputs_errors import generate_inputs_errors
 from on_track_sysid.model_params import get_model_param
-from on_track_sysid.nn_params import get_nn_params
 from on_track_sysid.NN import NeuralNetwork
 from on_track_sysid.pacejka_formula import pacejka_formula
 from on_track_sysid.solve_pacejka import solve_pacejka
@@ -16,6 +15,8 @@ from on_track_sysid.load_model import get_dotdict
 from on_track_sysid.plot_results import plot_results
 from on_track_sysid.gen_LUT import LookupGenerator
 from tqdm import tqdm
+import os
+import yaml
 
 def simulated_data_gen(nn_model, model, avg_vel):
     C_Pf_model = model['C_Pf_model']
@@ -85,6 +86,22 @@ def generate_training_set(training_data, model):
     X_train, y_train = generate_inputs_errors(v_y_next_pred, omega_next_pred, training_data)
     
     return X_train, y_train
+
+def get_nn_params():
+    """
+    Retrieve neural network parameters.
+
+    Loads neural network parameters from a YAML file.
+
+    Returns:
+        dict: Neural network parameters.
+    """
+    package_path = 'src/on_track_sysid'  # Replace with your package name
+    yaml_file = os.path.join(package_path, 'params/nn_params.yaml')
+    with open(yaml_file, 'r') as file:
+        nn_params = yaml.safe_load(file)
+        
+    return nn_params
 
 def assert_finite(t, name):
     if not torch.isfinite(t).all():

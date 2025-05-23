@@ -1,44 +1,22 @@
 import numpy as np
-import os
-import yaml
 from on_track_sysid.train_model import nn_train
 
 class RegularSysID():
     def __init__(self):
         self.rate = 50
-        self.model_version = 'SIM'
+        self.racecar_version = input("Enter the racecar version (All Caps): ")
         self.plot_model = True
-        self.load_parameters()
-        self.setup_data_storage()
-        #self.timer = self.create_timer(1.0 / self.rate, self.collect_data)
+        self.setup_dataset()
     
-    def setup_data_storage(self):
-        '''self.data_duration = self.nn_params['data_collection_duration']
-        self.timesteps = self.data_duration * self.rate'''
-        self.file = open("src/on_track_sysid/f1_training_data.csv", 'r')
-        speed_x = np.array([])
-        speed_y = np.array([])
-        steering_angle = np.array([])
-        omega = np.array([])
-        count = 0
-        next(self.file) #Skips header row
-        for lines in self.file:
-            speed_x = np.append(speed_x, (float(lines[1])*np.cos(float(lines[3]))))
-            speed_y = np.append(speed_y, (float(lines[1])*np.cos(float(lines[4]))))
-            steering_angle = np.append(steering_angle,float(lines[2]))
-            omega = np.append(omega, float(lines[6]))        
-        #print(speed_x.reshape(-1,1))
-        self.dataset = np.array([speed_x, speed_y, omega, steering_angle]).T
-        print(self.dataset.shape)
+    def setup_dataset(self):
+        self.dataset = np.genfromtxt(f"src/on_track_sysid/data/{self.racecar_version}_sys_id_data.csv", 
+                                     delimiter=',', 
+                                     skip_header=1)
+        print(self.dataset)
 
-    def load_parameters(self):
-        yaml_file = os.path.join('src/on_track_sysid/params/nn_params.yaml')
-        with open(yaml_file, 'r') as file:
-            self.nn_params = yaml.safe_load(file)
-        
     def run_nn_train(self):
         print("Begin Training")
-        nn_train(self.dataset, self.model_version, self.plot_model)
+        nn_train(self.dataset, self.racecar_version, self.plot_model)
         
 def main():
     sysid = RegularSysID()

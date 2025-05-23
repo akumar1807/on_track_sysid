@@ -1,8 +1,6 @@
 #Taken from ETH Repo and modified
 import yaml
-import os
 from on_track_sysid.dotdict import DotDict
-import rospkg
 
 def get_dict(model_name):
     model, tire = model_name.split("_")

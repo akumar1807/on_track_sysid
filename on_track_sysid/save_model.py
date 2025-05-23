@@ -24,8 +24,15 @@ def save(model, overwrite_existing=True, verbose=False):
     # Create necessary directories if they don't exist
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     
-    # Initialize ROS2 node
-    rclpy.init()
+    # Checks whether rclpy has been initialised or not
+    try:
+        rclpy.init()
+        print("rclpy has been initialized.")
+    except RuntimeError as e:
+        if "rclpy already initialized" in str(e):
+            print("rclpy is already initialized.")
+        else:
+            raise e
     node = Node('model_saver')
     node.get_logger().info(f"MODEL IS SAVED TO: {file_path}")
     

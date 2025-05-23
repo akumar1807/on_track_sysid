@@ -60,9 +60,9 @@ class SysIDForJetson(Node):
                 self.get_logger().info(f"No. of rows recorded: {self.counter}")
         elif not self.shutdown_triggered:
             self.get_logger().info("Data collection completed.")
+            self.export_data_as_csv()
             self.get_logger().info("Starting training...")
             nn_train(self.dataset, self.racecar_version, self.plot_model)
-            self.export_data_as_csv()
             self.shutdown_triggered = True
 
     def check_shutdown(self):

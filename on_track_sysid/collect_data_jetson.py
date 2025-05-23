@@ -74,8 +74,7 @@ class JetsonDataLogger(Node):
             csv_file = os.path.join(data_dir, f'{self.racecar_version}_sys_id_data.csv')
             with open(csv_file, 'w') as file:
                 writer = csv.writer(file)
-                print("Data Format: [speed_x, speed_y, omega, steering_angle] ")
-                #writer.writerow(['speed_x', 'speed_y', 'omega', 'steering_angle'])
+                writer.writerow(['speed_x', 'speed_y', 'omega', 'steering_angle'])
                 for row in self.dataset:
                     writer.writerow(row)
             self.get_logger().info("Exported to CSV successfully")

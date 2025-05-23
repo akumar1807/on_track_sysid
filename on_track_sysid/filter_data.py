@@ -8,8 +8,6 @@ def filter_data(training_data, model):
     Applies a low-pass Butterworth filter to each column of the training data array.
     """
     b, a = butter(N=3, Wn=0.1, btype='low')
-    #print(b,a)
-    #print(training_data)
     training_data[:,0] = filtfilt(b, a, training_data[:,0]) # v_x, longitudinal velocity
     training_data[:,1] = filtfilt(b, a, training_data[:,1]) # v_y, lateral velocity
     training_data[:,2] = filtfilt(b, a, training_data[:,2]) # omega, yaw rate
@@ -17,10 +15,9 @@ def filter_data(training_data, model):
     training_data[:,3] = np.roll(training_data[:,3], 5)
     training_data = training_data[5:,:]
     
-    
-    '''# If the model is not a simulation, adjusts lateral velocity based on the car's rear axle length.
+    # If the model is not a simulation, adjusts lateral velocity based on the car's rear axle length.
     if model["racecar_version"] != "SIM":
-        training_data[:,1] = training_data[:,1] + model["l_r"] * training_data[:,2]'''
+        training_data[:,1] = training_data[:,1] + model["l_r"] * training_data[:,2]
     
     return training_data
 
