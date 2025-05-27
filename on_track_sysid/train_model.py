@@ -152,8 +152,8 @@ def nn_train(training_data, racecar_version, plot_model):
             
         # Process training data and generate inputs and targets
         X_train, y_train = generate_training_set(training_data, model)
-        '''X_train = torch.as_tensor(X_train, dtype=torch.float32)
-        y_train = torch.as_tensor(y_train, dtype=torch.float32)'''
+        X_train = torch.as_tensor(X_train, dtype=torch.float32)
+        y_train = torch.as_tensor(y_train, dtype=torch.float32)
 
         assert_finite(X_train, "X_train")
         assert_finite(y_train, "y_train")
