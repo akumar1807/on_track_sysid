@@ -11,8 +11,11 @@ from sensor_msgs.msg import Imu
 class DataCollector(Node):
     def __init__(self):
         super().__init__('data_collector')
-        self.racecar_version = input("Enter the racecar version (All caps): ")
+        self.declare_parameter('racecar_version', 'JETSON')
+        self.declare_parameter('save_csv', True)
+        #self.racecar_version = input("Enter the racecar version (All caps): ")
 
+        self.racecar_version = self.get_parameter('racecar_version').get_parameter_value().string_value
         self.load_parameters()
         self.data_collection_duration = self.nn_params['data_collection_duration']
         self.rate = 50
@@ -87,8 +90,9 @@ class DataCollector(Node):
                 self.shutdown_triggered = True
 
     def export_data_as_csv(self):
-        ch = input("Save data to csv? (y/n): ")
-        if ch == "y":
+        save_to_csv = self.get_parameter('save_csv').get_parameter_value().bool_value
+        #ch = input("Save data to csv? (y/n): ")
+        if save_to_csv:
             data_dir = os.path.join('src/on_track_sysid', 'data')
             if not os.path.exists(data_dir):
                 os.makedirs(data_dir)

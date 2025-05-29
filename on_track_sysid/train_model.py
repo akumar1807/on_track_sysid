@@ -167,8 +167,6 @@ def nn_train(training_data, racecar_version, plot_model):
             # Forward pass on training data
             outputs = nn_model(X_train)
             train_loss = criterion(outputs, y_train) # + nn_model.l2_regularization_loss() # TODO add regularization if needed
-            '''if epoch % 250 == 0:
-                print(train_loss)'''
             optimizer.zero_grad()
             train_loss.backward()
             optimizer.step()
@@ -184,7 +182,6 @@ def nn_train(training_data, racecar_version, plot_model):
                 print(f"C_Pr_identified at Iteration {i}:", C_Pr_identified)
                 
                 if plot_model:
-                    #rclpy.get_logger().warn("Close the plot window (press Q) to continue... ")
                     plot_results(model, v_x, v_y, omega, delta, C_Pf_identified, C_Pr_identified, i)
                     
                 # Update model with identified coefficients

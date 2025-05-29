@@ -8,7 +8,7 @@ import os
 
 SIMULATION_DURATION = 3.0 # seconds
 SIMULATION_DT = 0.005 # seconds
-PLOT_LOOKUP = input("Want to generate LUT (y/n): ")
+PLOT_LOOKUP = False
 
 # Lookup parameters
 START_STEER = 0.0 # rad
@@ -47,7 +47,7 @@ class LookupGenerator:
   def run_generator(self):
     self.generate_lookup()
     self.find_upper_limits()
-    if PLOT_LOOKUP == 'y':
+    if PLOT_LOOKUP:
       print("Lookup Table has been generated.")
       self.plot_lookup()
     self.save_lookup()
