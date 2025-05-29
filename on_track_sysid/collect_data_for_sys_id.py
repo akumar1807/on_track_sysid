@@ -18,6 +18,9 @@ class DataCollector(Node):
         self.rate = 50
         self.storage_setup()
 
+        # Shutdown flag
+        self.shutdown_triggered = False
+
         if self.racecar_version == "SIM":
             self.create_subscription(Float32, '/autodrive/f1tenth_1/speed', self.speed_callback, 10)
             self.create_subscription(Float32, '/autodrive/f1tenth_1/steering', self.steering_callback, 10)
@@ -25,6 +28,9 @@ class DataCollector(Node):
         else:
             self.create_subscription(Odometry, '/odom', self.odom_cb, 10)
             self.create_subscription(Float64, '/commands/servo/position', self.steering_cb, 10)
+
+        #Shutdown timer
+        self.create_timer(0.1, self.check_shutdown)
 
     def load_parameters(self):
         yaml_file = os.path.join('src/on_track_sysid/params/nn_params.yaml')
@@ -62,6 +68,12 @@ class DataCollector(Node):
         gain = -1.2135
         self.current_state[3] = (servo_val-offset)/gain
         self.collect_data()
+
+    def check_shutdown(self):
+        if self.shutdown_triggered:
+            self.get_logger().info("Shutting down node...")
+            self.destroy_node()
+            rclpy.shutdown()
 
     def collect_data(self):
         if self.counter <= self.timesteps:

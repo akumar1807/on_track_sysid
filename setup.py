@@ -26,9 +26,7 @@ setup(
         'console_scripts': [
             'collect_data = on_track_sysid.collect_data_for_sys_id:main',
             'with_data_sys_id = on_track_sysid.with_data_sys_id:main',
-            'jetson_sys_id = on_track_sysid.jetson_sys_id:main',
-            'ontrack = on_track_sysid.on_track_jetson:main',
-            'jetson_collect = on_track_sysid.collect_data_jetson:main'
+            'ontrack = on_track_sysid.on_track_jetson:main'
         ],
     },
 )
