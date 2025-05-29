@@ -1,12 +1,10 @@
 # on\_track\_sysid
 
-**This is a ROS 2 package for end-to-end vehicle system identification on a scaled autonomous racecar (simulation *or* Jetson-based car).**
-
-To incorporate your own on-board computer, simply enter the model name when prompted for `self.racecar_version`
+**ROS 2 package for end-to-end vehicle system identification on a scaled autonomous racecar (simulation *or* Jetson-based car).**
 
 It automates
 
-1. **Data Collection** of longitudinal/lateral speed, yaw-rate and steering input.
+1. **Data logging** of longitudinal/lateral speed, yaw-rate and steering input.
 2. **Neural-network aided identification** of the lateral tyre model (Pacejka C-α coefficients).
 3. **Lookup-table generation** for downstream controllers.
 
@@ -37,20 +35,18 @@ source install/setup.bash
 
 ## Console scripts (nodes / helpers)
 
-| Script (call with `ros2 run on_track_sysid <name>`) | ROS 2 node name      | Purpose                                                                                            |
-| --------------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------- |
-| **`collect_data`**                                  | `data_collector`     | Log data **in simulation** (F1TENTH / Autodrive). Writes a CSV in *src/on\_track\_sysid/data/*.    |
-| **`jetson_collect`**                                | `jetson_data_logger` | Log data on the physical Jetson-based car.                                                         |
-| **`with_data_sys_id`**                              | *(no node)*          | Offline training **after** data have been collected. Reads the CSV and trains the NN + Pacejka ID. |
-| **`jetson_sys_id`**                                 | *(no node)*          | Same as above but loads the Jetson dataset by default.                                             |
-| **`ontrack`**                                       | `ontrack`            | One-shot pipeline **on the Jetson**: collects, trains, generates LUT, then exits.                  |
+| Script (call with `ros2 run on_track_sysid <name>`) | ROS 2 node name  | Purpose                                                                                            |
+| --------------------------------------------------- | ---------------- | -------------------------------------------------------------------------------------------------- |
+| **`collect_data`**                                  | `data_collector` | Log data **in simulation** (F1TENTH / Autodrive). Writes a CSV in *src/on\_track\_sysid/data/*.    |
+| **`with_data_sys_id`**                              | *(no node)*      | Offline training **after** data have been collected. Reads the CSV and trains the NN + Pacejka ID. |
+| **`ontrack`**                                       | `ontrack`        | One-shot pipeline **on the Jetson**: collects, trains, generates LUT, then exits.                  |
 
 > ℹ️  All scripts prompt for confirmation before overwriting datasets/models.
 
 ### Example
 
 ```bash
-# 1️⃣ Collect 30 s of data in simulation (Total data collection time can be changed in `nn_params.yaml`)
+# 1️⃣ Collect 30 s of data in simulation
 ros2 run on_track_sysid collect_data
 
 #   (follow the interactive prompts, drive the car, save the CSV)
@@ -100,10 +96,8 @@ Tune these as needed (e.g. shorter collection for quick tests).
 on_track_sysid/
 ├── on_track_sysid/              # Python package
 │   ├── collect_data_for_sys_id.py  # → collect_data
-│   ├── collect_data_jetson.py     # → jetson_collect
 │   ├── on_track_jetson.py         # → ontrack
 │   ├── with_data_sys_id.py        # → with_data_sys_id
-│   ├── jetson_sys_id.py           # → jetson_sys_id
 │   ├── train_model.py             # NN + tyre ID core
 │   └── …                          # helpers, NN, plotting, LUT gen
 ├── params/
@@ -151,4 +145,4 @@ See `LICENSE` (TBD).
 
 ### Acknowledgements
 
-Based on the ETH Zurich dynamic modelling workflow; adapted and extended for F1TENTH and Jetson-Nano hardware.
+Based on the ETHZ dynamic modelling workflow; adapted and extended for F1TENTH and Jetson-Nano hardware by **Ayush Kumar**.
