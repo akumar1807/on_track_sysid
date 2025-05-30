@@ -14,5 +14,5 @@ l_f: 0.14
 l_r: 0.135
 l_wb: 0.275
 m: 3.74
-model_name: JETSON
+model_name: JETSON1
 tire_model: pacejka

@@ -1,4 +1,4 @@
-data_collection_duration: 30 # seconds
+data_collection_duration: 60 # seconds
 num_of_iterations: 6 # number of iterations for training
 num_of_epochs: 5000 # number of epochs for training at each iteration
 lr: 0.0005 # learning rate

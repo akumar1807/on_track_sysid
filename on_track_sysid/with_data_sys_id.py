@@ -12,7 +12,7 @@ class RegularSysID():
         self.dataset = np.genfromtxt(f"src/on_track_sysid/data/{self.racecar_version}_sys_id_data.csv", 
                                      delimiter=',', 
                                      skip_header=1)
-        print(self.dataset)
+        print(self.dataset.shape)
 
     def run_nn_train(self):
         print("Begin Training")

@@ -10,6 +10,8 @@ class NeuralNetwork(nn.Module):
         self.l2 = nn.Linear(8, 2) # Output layer
         self.relu = nn.LeakyReLU()
 
+        self.initialize_weights()
+
         self.weight_decay = weight_decay
 
     def forward(self, x):
@@ -20,9 +22,9 @@ class NeuralNetwork(nn.Module):
         x = self.l2(x) 
         return x
     
-    def initialise_weights(self):
-        for layer in self.modules():
-                if isinstance(layer, nn.Linear):
-                        nn.init.kaiming_uniform_(layer.weight, nonlinearity='leaky_relu')
-                        nn.init.zeros_(layer.bias)
+    def initialize_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, mean=0.0, std=0.01)
+                nn.init.constant_(m.bias, 0.0)
 

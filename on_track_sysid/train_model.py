@@ -31,7 +31,7 @@ def simulated_data_gen(nn_model, model, avg_vel):
     F_zr = m * g * l_f / l_wb
     dt = 0.02 # 0.02 for 50 Hz
 
-    timesteps = 1501 # Number of timesteps to simulate
+    timesteps = 3000 # Number of timesteps to simulate
     
     v_y = np.zeros(timesteps)  # Initial lateral velocity
     omega = np.zeros(timesteps)  # Initial yaw rate
@@ -136,7 +136,8 @@ def nn_train(training_data, racecar_version, plot_model):
     training_data = process_data(training_data, model)   
      
     avg_vel = np.mean(training_data[:,0]) # Defining average velocity for the simulation, NN will have more accurate predictions
-    avg_vel = np.clip(avg_vel, 2.75, 4)
+    print(avg_vel)
+    #avg_vel = np.clip(avg_vel, 2.75, 4)
     
     # Initialize the network
     nn_model = NeuralNetwork()
