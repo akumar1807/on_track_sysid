@@ -3,7 +3,7 @@ from on_track_sysid.train_model import nn_train
 
 class RegularSysID():
     def __init__(self):
-        self.rate = 50
+        self.rate = 40
         self.racecar_version = input("Enter the racecar version (All Caps): ")
         self.plot_model = True
         self.setup_dataset()
